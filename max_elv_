@@ -3,8 +3,8 @@
 
 // Inspired by posts here http://www.domoticaforum.eu/viewtopic.php?f=66&t=6654
 
-$host = "";
-$port = "";
+$host = getenv('max_elv_host');
+$port = getenv('max_elv_port');
 
 $fp = @fsockopen($host, $port, $errno, $errstr, 5);
 if (!$fp) {
