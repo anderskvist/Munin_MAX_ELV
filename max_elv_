@@ -7,6 +7,10 @@ $host = getenv('max_elv_host');
 $port = getenv('max_elv_port');
 $hostname = (getenv('max_elv_hostname') ? getenv('max_elv_hostname') : null);
 
+if (isset($hostname)) {
+    echo "host_name " . $hostname . "\n";
+}
+
 $fp = @fsockopen($host, $port, $errno, $errstr, 5);
 if (!$fp) {
     die("ERROR CONNECTING ($errno, $errstr)\n");
@@ -77,17 +81,16 @@ function parse_L ($raw, &$data) {
     }
 }
 
-if ($argv[1] === 'config') {
-    if ($hostname != null) {
-        echo "host_name " . $hostname . "\n";
+foreach ($data as $id => $d) {
+    echo "multigraph " . $id . "\n";
+    if (array_key_exists(1, $argv) && $argv[1] === 'config') {
+        echo "graph_title MAX ELV - " . $d['name'] . "\n";
+        echo "graph_category HomeAutomation" . "\n";
+        echo "valve.label valve % opened\n";
+        echo "temp.label C° setpoint\n";
+    } else {
+        echo "valve.value " . $d['valve'] . "\n";
+        echo "temp.value " . $d['temp'] . "\n";
     }
-    echo "graph_title MAX ELV" . "\n";
-    echo "graph_category HomeAutomation" . "\n";
-} else {
-    foreach ($data as $id => $d) {
-        echo $id . "_valve.label " . $d['name'] . " valve opened\n";
-        echo $id . "_valve.value " . $d['valve'] . "\n";
-        echo $id . "_temp.label " . $d['name'] . " temperature setpoint\n";
-        echo $id . "_temp.value " . $d['temp'] . "\n";
-    }
+    echo "\n";
 }
