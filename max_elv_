@@ -85,9 +85,9 @@ if ($argv[1] === 'config') {
     echo "graph_category HomeAutomation" . "\n";
 } else {
     foreach ($data as $id => $d) {
-        echo $id . "_valve.name " . $d['name'] . " valve opened\n";
+        echo $id . "_valve.label " . $d['name'] . " valve opened\n";
         echo $id . "_valve.value " . $d['valve'] . "\n";
-        echo $id . "_temp.name " . $d['name'] . " temperature setpoint\n";
+        echo $id . "_temp.label " . $d['name'] . " temperature setpoint\n";
         echo $id . "_temp.value " . $d['temp'] . "\n";
     }
 }
