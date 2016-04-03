@@ -67,10 +67,10 @@ function parse_L ($raw, &$data) {
         $length = ord(substr($temp, 0, 1));
         
         $id = bin2hex(substr($temp, 1, 3));
-        $value = ord(substr($temp, 7, 1));
+        $valve = ord(substr($temp, 7, 1));
         $temp = ord(substr($temp, 8, 1));
 
-        $data[$id]['value'] = $value;
+        $data[$id]['valve'] = $valve;
         $data[$id]['temp'] = $temp;
         
         $temp = substr($temp, $length+1);
@@ -86,7 +86,7 @@ if ($argv[1] === 'config') {
 } else {
     foreach ($data as $id => $d) {
         echo $id . "_valve.name " . $d['name'] . " valve opened\n";
-        echo $id . "_valve.value " . $d['value'] . "\n";
+        echo $id . "_valve.value " . $d['valve'] . "\n";
         echo $id . "_temp.name " . $d['name'] . " temperature setpoint\n";
         echo $id . "_temp.value " . $d['temp'] . "\n";
     }
