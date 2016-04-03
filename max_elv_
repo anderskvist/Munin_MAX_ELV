@@ -68,10 +68,10 @@ function parse_L ($raw, &$data) {
         
         $id = bin2hex(substr($temp, 1, 3));
         $valve = ord(substr($temp, 7, 1));
-        $temp = ord(substr($temp, 8, 1));
+        $temperature = (ord(substr($temp, 8, 1))/2);
 
         $data[$id]['valve'] = $valve;
-        $data[$id]['temp'] = $temp;
+        $data[$id]['temp'] = $temperature;
         
         $temp = substr($temp, $length+1);
     }
