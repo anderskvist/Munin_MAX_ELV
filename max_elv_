@@ -88,6 +88,10 @@ foreach ($data as $id => $d) {
         echo "graph_category HomeAutomation" . "\n";
         echo "valve.label valve % opened\n";
         echo "temp.label C° setpoint\n";
+	echo "valve.draw LINE2\n";
+	echo "temp.draw AREA\n";
+	echo "valve.colour 000000\n";
+	echo "temp.colour FFFF00\n";
     } else {
         echo "valve.value " . $d['valve'] . "\n";
         echo "temp.value " . $d['temp'] . "\n";
