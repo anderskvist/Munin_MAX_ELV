@@ -6,6 +6,7 @@
 $host = getenv('max_elv_host');
 $port = getenv('max_elv_port');
 $hostname = (getenv('max_elv_hostname') ? getenv('max_elv_hostname') : null);
+$metar = getenv('max_elv_metar');
 
 if (isset($hostname)) {
     echo "host_name " . $hostname . "\n";
@@ -30,6 +31,17 @@ while (!feof($fp)) {
 fclose($fp);
 
 $array = explode("\n\n",$buffer);
+
+$metar_file = file_get_contents("http://weather.noaa.gov/pub/data/observations/metar/stations/" . $metar . ".TXT");
+$metar_array = explode("\n", $metar_file);
+
+if (preg_match("/^EKYT [0-9]{6}Z [0-9]{3}([0-9]{2})KT [0-9]{4} [A-Z0-9]{6} [A-Z0-9]{6} ([0-9]{2})\/[0-9]{2} [A-Z0-9]{5}$/", $metar_array[1], $matches)) {
+  $metar_wind = $matches[1];
+  $metar_temp = $matches[2];
+} else {
+  $metar_wind = 0;
+  $metar_temp = 0;
+}
 
 $data = array();
 
@@ -87,13 +99,21 @@ foreach ($data as $id => $d) {
         echo "graph_title MAX ELV - " . $d['name'] . "\n";
         echo "graph_category HomeAutomation" . "\n";
         echo "temp.label C° setpoint\n";
+        echo "metar_temp.label C° outside\n";
+        echo "metar_wind.label wind in kt\n";
         echo "valve.label valve % opened\n";
 	echo "temp.draw AREA\n";
+	echo "metar_temp.draw LINE2\n";
+	echo "metar_wind.draw LINE2\n";
 	echo "valve.draw LINE2\n";
 	echo "temp.colour FFFF00\n";
+	echo "metar_temp.colour 00FF00\n";
+	echo "metar_wind.colour FF0000\n";
 	echo "valve.colour 000000\n";
     } else {
         echo "temp.value " . $d['temp'] . "\n";
+        echo "metar_temp.value " . $metar_temp . "\n";
+        echo "metar_wind.value " . $metar_wind . "\n";
         echo "valve.value " . $d['valve'] . "\n";
     }
     echo "\n";
