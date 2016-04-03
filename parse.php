@@ -1,0 +1,80 @@
+#!/usr/bin/php
+<?php
+
+// Inspired by posts here http://www.domoticaforum.eu/viewtopic.php?f=66&t=6654
+
+$host = "";
+$port = "";
+
+$fp = @fsockopen($host, $port, $errno, $errstr, 5);
+if (!$fp) {
+    die("ERROR CONNECTING ($errno, $errstr)\n");
+}
+
+socket_set_blocking($fp,false);
+
+$buffer = "";
+while (!feof($fp)) {
+    $line = fgets($fp);
+    
+    if ($line != "")
+        $buffer .= $line."\n";
+    if (strpos($line,"L:") !== false)
+            break;
+}
+fclose($fp);
+
+$array = explode("\n\n",$buffer);
+
+$data = array();
+
+foreach ($array as $element) {
+    $type = substr($element, 0,1);
+
+    switch ($type) {
+    case 'M':
+        parse_M(substr($element, 8), $data);
+        break;
+    case 'L':
+        parse_L(substr($element, 2), $data);
+        break;
+    }
+}
+
+function parse_M ($raw, &$data) {
+    $temp = base64_decode($raw);
+
+    $num = bin2hex(substr($temp, 2, 1));
+
+    $temp = substr($temp, 3);
+
+    while(strlen($temp) > 0 && $num-- > 0) {
+        $length = ord(substr($temp, 1, 1));
+        $name = substr($temp, 1+1, $length);
+        $id = bin2hex(substr($temp, 1+1+$length,3));
+
+        $data[$id]['name'] = $name;
+        
+        $temp = substr($temp, 1+1+$length+3);
+    }
+}
+
+function parse_L ($raw, &$data) {
+    $temp =  base64_decode($raw);
+
+    while (strlen($temp) > 0) {
+        $length = ord(substr($temp, 0, 1));
+        
+        $id = bin2hex(substr($temp, 1, 3));
+        $value = ord(substr($temp, 7, 1));
+
+        $data[$id]['value'] = $value;
+        
+        $temp = substr($temp, $length+1);
+    }
+}
+
+foreach ($data as $id => $d) {
+    echo $id . ".name " . $d['name'] . "\n";
+    echo $id . ".value " . $d['value'] . "\n";
+}
